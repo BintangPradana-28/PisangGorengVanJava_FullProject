@@ -1,0 +1,6 @@
+2026-05-24T09:53:45.131Z {"msg":"CartContext mounted. status: loading"}
+2026-05-24T09:53:45.138Z {"msg":"CartContext mounted. status: loading"}
+2026-05-24T09:53:45.425Z {"msg":"CartContext mounted. status: authenticated"}
+2026-05-24T09:53:45.442Z {"msg":"Starting getCartItemsDB"}
+2026-05-24T09:53:47.563Z {"msg":"getCartItemsDB resolved","data":{"success":false,"error":"Internal Server Error"}}
+2026-05-24T09:53:47.584Z {"msg":"getCartItemsDB returned false success"}

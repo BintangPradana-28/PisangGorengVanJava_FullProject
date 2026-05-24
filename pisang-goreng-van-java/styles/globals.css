@@ -1,0 +1,191 @@
+/* styles/globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --cream:       #FDF6E3;
+    --cream-dark:  #F5E6C8;
+    --brown:       #3D1C02;
+    --amber-brand: #D4802A;
+    --green-wa:    #2E7D32;
+
+    /* Heritage Warm Earthy Mode (Light) */
+    --background-custom: #FAF6F0;
+    --text-custom: #4A3525;
+    --on-surface-variant: #504440;
+    --surface-custom: #FAF6F0;
+    --primary-custom: #3D1C02;
+    --secondary-custom: #D4802A;
+    --card-bg: #FFFFFF;
+    --border-custom: #E6CBB3;
+  }
+
+  .dark {
+    /* Premium Deep Gray & Banana Leaf Green / Gold Mode (Dark) */
+    --background-custom: #121212;
+    --text-custom: #F4F4F5;
+    --on-surface-variant: #D4D4D8;
+    --surface-custom: #18181B;
+    --primary-custom: #D4A373; /* Gold accent */
+    --secondary-custom: #10B981; /* Banana green accent */
+    --card-bg: #1F1F23;
+    --border-custom: #27272A;
+  }
+
+  * { box-sizing: border-box; }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 80px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    background-color: var(--background-custom);
+    color: var(--text-custom);
+    font-family: var(--font-sans), system-ui, sans-serif;
+    transition: background-color 0.3s, color 0.3s;
+  }
+
+  .dark body {
+    background-color: var(--background-custom);
+    color: var(--text-custom);
+  }
+
+  h1, h2, h3 { @apply font-serif; }
+}
+
+/* Scroll Progress Bar */
+#scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3.5px;
+  background: linear-gradient(to right, var(--primary-custom), var(--secondary-custom));
+  z-index: 9999;
+  transition: width 0.1s ease-out;
+}
+
+/* Premium Shimmer Skeleton */
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(196, 149, 106, 0.08) 25%,
+    rgba(196, 149, 106, 0.18) 50%,
+    rgba(196, 149, 106, 0.08) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer-pulse 1.6s infinite;
+}
+
+.dark .skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04) 25%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.04) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer-pulse 1.6s infinite;
+}
+
+@keyframes shimmer-pulse {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@layer utilities {
+  /* Stitch Custom Typographic Scales */
+  .font-display-lg {
+    @apply font-serif text-[48px] leading-[56px] tracking-[-0.02em] font-bold;
+  }
+  .font-headline-lg {
+    @apply font-serif text-[32px] leading-[40px] font-semibold;
+  }
+  .font-headline-lg-mobile {
+    @apply font-serif text-[24px] leading-[32px] font-semibold;
+  }
+  .font-title-md {
+    @apply font-sans text-[18px] leading-[24px] font-semibold;
+  }
+  .font-body-md {
+    @apply font-sans text-[16px] leading-[24px] font-normal;
+  }
+  .font-label-sm {
+    @apply font-sans text-[12px] leading-[16px] tracking-[0.05em] font-medium;
+  }
+}
+
+@layer components {
+  /* Scroll reveal utility */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* WhatsApp button */
+  .btn-wa {
+    @apply inline-flex items-center gap-2 bg-green-wa text-white font-semibold
+           px-6 py-3 rounded-full transition-all duration-200
+           hover:bg-green-wa-light hover:-translate-y-0.5 active:scale-95;
+  }
+
+  /* Brown CTA button */
+  .btn-brown {
+    @apply inline-flex items-center gap-2 bg-brown-700 text-cream-100 font-semibold
+           px-5 py-2.5 rounded-xl transition-all duration-200
+           hover:bg-brown-600 active:scale-95;
+  }
+
+  /* Card hover */
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+  }
+
+  /* Matrix row */
+  .matrix-row-hover {
+    @apply transition-colors duration-150 hover:bg-white/10 cursor-pointer;
+  }
+  .matrix-row-hover.selected {
+    @apply bg-white/20;
+  }
+
+  /* Sidebar item */
+  .sidebar-item {
+    @apply flex items-center gap-3 px-4 py-2.5 rounded-xl text-cream-200/70 text-sm font-medium
+           cursor-pointer transition-all duration-200 hover:bg-white/10 hover:text-white;
+  }
+  .sidebar-item.active {
+    @apply bg-amber-brand text-white;
+  }
+
+  /* Form input */
+  .form-input {
+    @apply w-full px-3.5 py-2.5 border border-cream-200 rounded-xl text-brown-700
+           bg-white font-sans text-sm focus:outline-none focus:ring-2 focus:ring-amber-brand/40
+           transition-shadow;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--background-custom); }
+::-webkit-scrollbar-thumb { background: var(--secondary-custom); border-radius: 3px; }
+
+/* Animation delay utilities */
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }

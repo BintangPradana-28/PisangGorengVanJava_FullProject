@@ -1,0 +1,10 @@
+{
+  "buildCommand": "prisma generate && prisma db push && next build",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "env": {
+    "DATABASE_URL": "@database_url",
+    "SESSION_SECRET": "@session_secret",
+    "NEXT_PUBLIC_WA_NUMBER": "@wa_number"
+  }
+}

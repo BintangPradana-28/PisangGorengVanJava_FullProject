@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "google-stitch-design-system": {
+      "command": "npx",
+      "args": ["-y", "@google/stitch-mcp-server"],
+      "env": {
+        "STITCH_PROJECT_URL": "https://stitch.withgoogle.com/projects/10023324809637368535",
+        "STITCH_API_TOKEN": "AQ.Ab8RN6LWJM3zgjMRd6xA-kpQWn4ydDkbOSOS7NWgQqERbcMATg"
+      }
+    }
+  }
+}

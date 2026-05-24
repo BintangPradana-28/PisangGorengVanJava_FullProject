@@ -1,0 +1,296 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  ADMIN
+  CUSTOMER
+  RESELLER
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  passwordHash  String?
+  phone         String?
+  address       String?
+  role          Role      @default(CUSTOMER)
+  isDeleted     Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts      Account[]
+  resetTokens   ResetToken[]
+  favorites     Favorite[]
+  reviews       Review[]
+  cart          Cart?
+
+  @@index([email])
+}
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?
+  access_token       String?
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model ResetToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  expiresAt DateTime
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model MenuVariant {
+  id                String      @id @default(cuid())
+  flavorName        String      @map("nama_varian")
+  priceKembung      Int         @default(0)
+  priceLumpia       Int         @default(0)
+  priceKrispy       Int         @default(0)
+  wholesaleKembung  Int         @default(0)
+  wholesaleLumpia   Int         @default(0)
+  wholesaleKrispy   Int         @default(0)
+  harga             Float?      // Legacy column
+  deskripsi_topping String?     // Legacy column
+  imageUrl          String?     @map("foto_url")
+  isActive          Boolean     @default(true)
+  isAvailable       Boolean     @default(true) // Untuk stok harian
+  isDeleted         Boolean     @default(false) // Untuk Soft Delete
+  tags              String[]    @default([])    // Array of string for tagging (e.g., "Manis", "Gurih")
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  orderItems        OrderItem[]
+  favorites         Favorite[]
+  reviews           Review[]
+  cartItems         CartItem[]
+
+  @@index([flavorName]) // Database Indexing
+  @@index([isDeleted])
+  @@index([isActive])
+  @@map("Product")
+}
+
+model Settings {
+  id              String   @id @default(cuid())
+  nomor_wa        String
+  alamat          String
+  jam_operasional String
+  isDeleted       Boolean  @default(false) // Untuk Soft Delete
+  updatedAt       DateTime @updatedAt
+}
+
+model SiteSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  label     String?
+  group     String   @default("general")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([group])
+}
+
+model Topping {
+  id         String      @id @default(cuid())
+  name       String      @unique
+  price      Int         @default(2000)
+  emoji      String?
+  isActive   Boolean     @default(true) // Untuk toggle stok ketersediaan
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  orderItems OrderItem[]
+  cartItems  CartItem[]
+
+  @@index([isActive])
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  customerName  String
+  customerPhone String
+  totalPrice    Float
+  status        String      @default("pending") // pending, confirmed, ready, done, cancelled
+  notes         String?
+  source        String      @default("whatsapp") // whatsapp, walk-in
+  voucherCode   String?     // Nullable, if they used a voucher
+  discountAmount Float      @default(0) // Total discount applied
+  deliveryMethod String     @default("DELIVERY")
+  deliveryFee   Float       @default(0)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  items         OrderItem[]
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Voucher {
+  id            String      @id @default(cuid())
+  code          String      @unique
+  discountType  String      @default("PERCENTAGE") // PERCENTAGE atau FIXED
+  discountValue Float
+  minPurchase   Float       @default(0)
+  maxDiscount   Float?      // Nullable, if null = unlimited
+  startDate     DateTime    @default(now())
+  endDate       DateTime
+  usageLimit    Int         @default(0) // 0 means unlimited
+  usedCount     Int         @default(0)
+  isActive      Boolean     @default(true)
+  applicableTo  String      @default("ALL") // ALL, CUSTOMER, RESELLER
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([code])
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  variantId String
+  toppingId String?
+  baseType  String
+  quantity  Int
+  unitPrice Float
+  subtotal  Float
+
+  order   Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  variant MenuVariant  @relation(fields: [variantId], references: [id])
+  topping Topping?     @relation(fields: [toppingId], references: [id])
+
+  @@index([orderId])
+  @@index([variantId])
+  @@index([toppingId])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  action     String   // e.g. "CREATE", "UPDATE", "DELETE"
+  resource   String   // e.g. "MenuVariant", "Topping"
+  resourceId String
+  userId     String?  // Who did it (can be null if system)
+  details    String?  // JSON string of changes
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+
+  @@index([resourceId])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  variantId String
+  createdAt DateTime @default(now())
+
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  variant   MenuVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, variantId])
+  @@index([userId])
+  @@index([variantId])
+}
+
+model Banner {
+  id          String   @id @default(cuid())
+  title       String
+  subtitle    String?
+  badge       String?
+  imageUrl    String?
+  isActive    Boolean  @default(true)
+  linkUrl     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isActive])
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  userId    String
+  variantId String
+  rating          Int      // 1-5
+  comment         String?
+  imageUrl        String?
+  isVerifiedBuyer Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user    User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  variant MenuVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, variantId]) // Satu user hanya bisa review 1x per varian
+  @@index([variantId])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model Cart {
+  id        String     @id @default(cuid())
+  userId    String     @unique
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     CartItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@index([userId])
+}
+
+model CartItem {
+  id          String   @id @default(cuid())
+  cartId      String
+  cart        Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  variantId   String
+  variant     MenuVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  toppingId   String?
+  topping     Topping? @relation(fields: [toppingId], references: [id], onDelete: Cascade)
+  baseType    String
+  quantity    Int
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([cartId])
+  @@index([variantId])
+  @@index([toppingId])
+}
+
+model ContactLead {
+  id        String   @id @default(cuid())
+  name      String
+  message   String
+  ipAddress String?
+  userAgent String?
+  isConsent Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
