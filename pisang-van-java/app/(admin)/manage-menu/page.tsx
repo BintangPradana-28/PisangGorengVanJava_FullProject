@@ -35,6 +35,7 @@ export default async function ManageMenuPage() {
     imageUrl: p.imageUrl,
     deskripsi_topping: p.deskripsi_topping,
     isAvailable: p.isAvailable,
+    stock: p.stock,
     tags: p.tags || [],
   }));
 
