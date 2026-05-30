@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import { Be_Vietnam_Pro, Newsreader } from 'next/font/google'
 import '../styles/globals.css'
 import { Providers } from './providers'
-import { Analytics } from '@vercel/analytics/react'
+import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import Script from 'next/script'
 
