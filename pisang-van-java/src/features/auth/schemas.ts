@@ -13,16 +13,13 @@ export const loginSchema = z.object({
 }); // Removed .strict() to allow NextAuth internal fields
 
 export const registerSchema = z.object({
-  name: z.string().trim().min(2).max(80).regex(/^[A-Za-z\s]+$/, "Nama hanya boleh berisi alfabet dan spasi"),
+  name: z.string().trim().min(2).max(80),
   email: z.string().trim().min(3).max(254).email(),
-  whatsapp: z.string().trim().regex(/^(\+62|62|0)8[1-9][0-9]{6,10}$/, "Format WhatsApp tidak valid"),
+  whatsapp: z.string().trim().min(9).max(16).regex(/^[0-9+]+$/, "Hanya boleh angka dan tanda plus"),
   password: z
     .string()
     .min(8, "Sandi minimal 8 karakter")
-    .max(128, "Sandi maksimal 128 karakter")
-    .regex(/[A-Z]/, "Harus mengandung huruf besar")
-    .regex(/[0-9]/, "Harus mengandung angka")
-    .regex(/[^A-Za-z0-9]/, "Harus mengandung simbol spesial"),
+    .max(128, "Sandi maksimal 128 karakter"),
   consent: z.boolean().refine((val) => val === true, {
     message: "Anda harus menyetujui Kebijakan Privasi",
   }),
