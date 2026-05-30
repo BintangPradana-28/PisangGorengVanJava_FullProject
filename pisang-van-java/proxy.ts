@@ -29,9 +29,13 @@ const authMiddleware = withAuth(
   }
 );
 
-export default async function middleware(req: NextRequest) {
+import { NextRequestWithAuth } from "next-auth/middleware";
+
+export default async function middleware(req: NextRequest, event: import("next/server").NextFetchEvent) {
   try {
-    const ip = req.headers.get("x-forwarded-for") || req.ip || "127.0.0.1";
+    const forwardedFor = req.headers.get("x-forwarded-for");
+    const ip = forwardedFor ? forwardedFor.split(",")[0].trim() : "127.0.0.1";
+    
     const { success } = await globalRateLimit.limit(`global_${ip}`);
     
     if (!success) {
@@ -42,8 +46,8 @@ export default async function middleware(req: NextRequest) {
     console.error("[SECURITY] Global Rate Limiter failed, bypassing...", error);
   }
 
-  // Pass to NextAuth middleware
-  return (authMiddleware as any)(req, null as any);
+  // Pass to NextAuth middleware without Type Saboteurs
+  return authMiddleware(req as unknown as NextRequestWithAuth, event);
 }
 
 export const config = {
