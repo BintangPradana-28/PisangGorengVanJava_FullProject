@@ -9,11 +9,7 @@ const nextConfig = {
     ],
   },
   serverExternalPackages: ['@prisma/client', 'bcryptjs'],
-  // 🛡️ CISO FIX: Turbopack bukan lagi experimental di Next.js 16.
-  // Pindahkan langsung ke tingkat root untuk stabilitas.
-  turbopack: {
-    root: __dirname,
-  },
+
   async headers() {
     return [
       {
